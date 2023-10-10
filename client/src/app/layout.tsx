@@ -21,6 +21,8 @@ export default function RootLayout({
         <nav className="top-0 bg-gray-400 p-6 flex flex-wrap space-x-7">
           <Link href="/">Home</Link>
           <Link href="/login">Login</Link>
+          <Link href="/catalog">Catalog</Link>
+          <Link href="/admin">Admin</Link>
         </nav>
         <div className="mt-8">{children}</div>
       </body>
