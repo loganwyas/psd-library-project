@@ -1,11 +1,16 @@
-import Image from "next/image";
+"use client";
+
 import { useEffect, useState } from "react";
+import { redirect } from "next/navigation";
+import Cookies from "universal-cookie";
+const cookies = new Cookies();
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loggingIn, setLogging] = useState(false);
 
-  const server = "http://127.0.0.1:5000/";
+  const server = "http://127.0.0.1:5001/";
   function login() {
     fetch(server + "login", {
       method: "POST",
@@ -19,9 +24,19 @@ export default function Login() {
       },
     })
       .then((response) => response.json())
-      .then((response) => console.log(response))
+      .then((user) => {
+        cookies.set("user", user, { path: "/" });
+        setLogging(true);
+      })
       .catch((error) => console.log(error));
   }
+
+  useEffect(() => {
+    let user = cookies.get("user");
+    if (user) {
+      redirect("/");
+    }
+  }, [loggingIn]);
 
   return (
     <div className="text-center">
