@@ -27,14 +27,27 @@ export default function RootLayout({
     setUser(cookies.get("user"));
   }, [pathname, searchParams]);
 
+  function logout() {
+    cookies.set("user", null);
+  }
+
   return (
     <html lang="en">
       <body className={inter.className}>
         <nav className="top-0 bg-gray-400 p-6 flex flex-wrap space-x-7">
           <Link href="/">Home</Link>
-          {!user && <Link href="/login">Login</Link>}
           {user && <Link href="/catalog">Catalog</Link>}
           {user && <Link href="/admin">Admin</Link>}
+          {!user && (
+            <Link href="/login" className="!ml-auto">
+              Login
+            </Link>
+          )}
+          {user && (
+            <Link href="/login" onClick={logout} className="!ml-auto">
+              Logout
+            </Link>
+          )}
         </nav>
         <div className="mt-8">{children}</div>
       </body>

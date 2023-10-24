@@ -5,7 +5,6 @@ class Database():
         # Connect to the SQLite database
         self.conn = sqlite3.connect("library.db")
         self.cursor = self.conn.cursor()
-        self.user = None
 
         # Create the Users table
         self.cursor.execute("""
@@ -63,6 +62,5 @@ class Database():
         self.cursor.execute("SELECT username, password, role, id FROM Users WHERE username=?", (username,))
         user = self.cursor.fetchone()
         if (user and user[1] == password):
-            self.user = user
             return user
         return None
