@@ -20,7 +20,7 @@ jobs:
     steps:
       - checkout
       - node/install-packages:
-          app-dir: ~/client
+          app-dir: ~/client/client
           pkg-manager: npm
       - run:
           command: "npm run build"
