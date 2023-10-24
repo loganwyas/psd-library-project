@@ -8,6 +8,7 @@ const cookies = new Cookies();
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loggingIn, setLogging] = useState(false);
 
   const server = "http://127.0.0.1:5001/";
@@ -17,7 +18,7 @@ export default function Login() {
       method: "POST",
       body: JSON.stringify({
         username: username.trim(),
-        password,
+        password: password.trim(),
         role: "user",
       }),
       headers: {
@@ -30,8 +31,8 @@ export default function Login() {
           return response.json();
         } else {
           let message = creatingAccount
-            ? "Failed to create an account"
-            : "Failed to login";
+            ? "Failed to create an account. This is most likely because the username already exists."
+            : "Failed to login. This is most likely because the username or password are incorrect.";
           throw new Error(message);
         }
       })
@@ -39,7 +40,11 @@ export default function Login() {
         cookies.set("user", user, { path: "/" });
         setLogging(true);
       })
-      .catch((error) => console.log(error));
+      .catch((error: Error) => setError(error.message));
+  }
+
+  function inputFilled() {
+    return !(username.trim() !== "" && password.trim() !== "");
   }
 
   useEffect(() => {
@@ -54,17 +59,48 @@ export default function Login() {
       <h1 className="text-3xl font-bold">Login</h1>
       <br />
       <label htmlFor="username">Username: </label>
-      <input onChange={(e) => setUsername(e.target.value)} id="username" />
+      <input
+        onChange={(e) => setUsername(e.target.value)}
+        id="username"
+        className="px-1"
+      />
       <br />
       <br />
       <label htmlFor="password">Password: </label>
-      <input onChange={(e) => setPassword(e.target.value)} id="password" />
+      <input
+        onChange={(e) => setPassword(e.target.value)}
+        id="password"
+        className="px-1"
+      />
       <br />
       <br />
       <div>
-        <button onClick={() => login(false)}>Login</button>
-        <button onClick={() => login(true)}>Create Account</button>
+        <button
+          onClick={() => login(false)}
+          className={
+            "mr-3 p-2 border border-solid border-black " +
+            (inputFilled() ? "text-gray-400 border-gray-400" : "")
+          }
+          disabled={inputFilled()}
+        >
+          Login
+        </button>
+        <button
+          onClick={() => login(true)}
+          className={
+            "ml-3 p-2 border border-solid border-black " +
+            (inputFilled() ? "text-gray-400 border-gray-400" : "")
+          }
+          disabled={inputFilled()}
+        >
+          Create Account
+        </button>
       </div>
+      {error && (
+        <div className="mt-10">
+          <p className="text-red-400">{error}</p>
+        </div>
+      )}
     </div>
   );
 }
