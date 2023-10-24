@@ -25,7 +25,7 @@ jobs:
       - run:
           command: "cd client; npm run build"
       - store_artifacts:
-          path: build
+          path: client/build
 
 workflows:
   project-workflow:
