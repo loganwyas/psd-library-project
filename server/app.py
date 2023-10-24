@@ -35,3 +35,25 @@ def login():
         mimetype="application/json",
         status=status_code,
     )
+    
+@app.route("/create_account", methods=["POST"])
+@cross_origin()
+def create_account():
+    user_info = request.get_json()
+    db = Database()
+    user = db.add_user(user_info["username"], user_info["password"], user_info["role"])
+    data = None
+    status_code = 404
+    if user:
+        data = {
+            "id": user[3],
+            "username": user[0],
+            "password": user[1],
+            "role": user[2],
+        }
+        status_code = 200
+    return Response(
+        json.dumps(data) if data else None,
+        mimetype="application/json",
+        status=status_code,
+    )

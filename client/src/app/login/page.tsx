@@ -11,19 +11,30 @@ export default function Login() {
   const [loggingIn, setLogging] = useState(false);
 
   const server = "http://127.0.0.1:5001/";
-  function login() {
-    fetch(server + "login", {
+  function login(creatingAccount: boolean) {
+    let address = creatingAccount ? "create_account" : "login";
+    fetch(server + address, {
       method: "POST",
       body: JSON.stringify({
-        username,
+        username: username.trim(),
         password,
+        role: "user",
       }),
       headers: {
         "Content-Type": "application/json",
         Authorization: username,
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status == 200) {
+          return response.json();
+        } else {
+          let message = creatingAccount
+            ? "Failed to create an account"
+            : "Failed to login";
+          throw new Error(message);
+        }
+      })
       .then((user) => {
         cookies.set("user", user, { path: "/" });
         setLogging(true);
@@ -50,7 +61,10 @@ export default function Login() {
       <input onChange={(e) => setPassword(e.target.value)} id="password" />
       <br />
       <br />
-      <button onClick={login}>Login</button>
+      <div>
+        <button onClick={() => login(false)}>Login</button>
+        <button onClick={() => login(true)}>Create Account</button>
+      </div>
     </div>
   );
 }

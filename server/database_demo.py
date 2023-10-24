@@ -10,7 +10,7 @@ class Database():
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS Users (
                 id INTEGER PRIMARY KEY,
-                username TEXT NOT NULL,
+                username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
                 role TEXT NOT NULL
             )
@@ -25,18 +25,20 @@ class Database():
                 published_year INTEGER
             )
         """)
+        try:
+            # Add an admin user
+            self.cursor.execute("""
+                INSERT INTO Users (username, password, role)
+                VALUES (?, ?, ?)
+            """, ("admin", "admin_password", "admin"))
 
-        # Add an admin user
-        self.cursor.execute("""
-            INSERT INTO Users (username, password, role)
-            VALUES (?, ?, ?)
-        """, ("admin", "admin_password", "admin"))
-
-        # Add a regular user
-        self.cursor.execute("""
-            INSERT INTO Users (username, password, role)
-            VALUES (?, ?, ?)
-        """, ("user", "user_password", "user"))
+            # Add a regular user
+            self.cursor.execute("""
+                INSERT INTO Users (username, password, role)
+                VALUES (?, ?, ?)
+            """, ("user", "user_password", "user"))
+        except:
+            pass
 
         # Add some books
         self.cursor.execute("""
@@ -52,11 +54,17 @@ class Database():
         self.conn.commit()
 
     def add_user(self, username, password, role):
-        self.cursor.execute("""
-            INSERT INTO Users (username, password, role)
-            VALUES (?, ?, ?)
-        """, (username, password, role))
-        self.conn.commit()
+        try:
+            self.cursor.execute("""
+                INSERT INTO Users (username, password, role)
+                VALUES (?, ?, ?)
+            """, (username, password, role))
+            self.conn.commit()
+
+            self.cursor.execute("SELECT username, password, role, id FROM Users WHERE username=?", (username,))
+            return self.cursor.fetchone()
+        except:
+            return None
     
     def login(self, username, password):
         self.cursor.execute("SELECT username, password, role, id FROM Users WHERE username=?", (username,))
