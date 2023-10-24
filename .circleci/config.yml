@@ -7,25 +7,23 @@ orbs:
 jobs:
   build_server:
     executor: python/default
+    working_directory: ~/server
     steps:
       - checkout
-      - run:
-          command: "cd server"
       - python/install-packages:
-          pip-dependency-file: requirements.txt
+          pip-dependency-file: server/requirements.txt
           pkg-manager: pip
   build_client:
     executor: node/default
+    working_directory: ~/client
     steps:
       - checkout
-      - run:
-          command: "cd client"
       - node/install-packages:
           pkg-manager: npm
       - run:
           command: "npm run build"
       - store_artifacts:
-          path: /client/build
+          path: build
 
 workflows:
   project-workflow:
