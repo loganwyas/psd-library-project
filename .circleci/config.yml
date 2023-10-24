@@ -13,12 +13,14 @@ jobs:
       - python/install-packages:
           pip-dependency-file: server/requirements.txt
           pkg-manager: pip
+
   build_client:
     executor: node/default
     working_directory: ~/client
     steps:
       - checkout
       - node/install-packages:
+          app-dir: ~/client
           pkg-manager: npm
       - run:
           command: "npm run build"
