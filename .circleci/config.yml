@@ -16,7 +16,7 @@ jobs:
 
   build_client:
     executor: node/default
-    working_directory: ~/client
+    working_directory: ~/client/client
     steps:
       - checkout
       - node/install-packages:
