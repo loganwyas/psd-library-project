@@ -1,4 +1,5 @@
 import sqlite3
+import json
 
 class Database():
     def __init__(self):
@@ -20,11 +21,23 @@ class Database():
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS Catalog (
                 id INTEGER PRIMARY KEY,
+                type TEXT NOT NULL,
                 title TEXT NOT NULL,
                 author TEXT NOT NULL,
-                published_year INTEGER
+                release INTEGER
             )
         """)
+        
+        # Create the Libraries table
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS Libraries (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                latitude REAL,
+                longitude REAL
+            )
+        """)
+        
         try:
             # Add an admin user
             self.cursor.execute("""
@@ -38,7 +51,23 @@ class Database():
                 VALUES (?, ?, ?)
             """, ("user", "user_password", "user"))
             
-            
+            with open("initial_data.json", "r") as file:
+                data = json.load(file)
+                catalog = data["catalog"]
+                for itemType in ["book", "videoGame", "movie"]:
+                    items = catalog[itemType]
+                    for item in items:
+                        self.cursor.execute("""
+                            INSERT INTO Catalog (type, title, author, release)
+                            VALUES (?, ?, ?, ?)
+                        """, (itemType, item["title"], item["author"], item["release"]))
+                        
+                for library in data["libraries"]:
+                    self.cursor.execute("""
+                        INSERT INTO Libraries (name, latitude, longitude)
+                        VALUES (?, ?, ?)
+                    """, (library["name"], library["latitude"], library["longitude"]))
+                        
         except:
             pass
 

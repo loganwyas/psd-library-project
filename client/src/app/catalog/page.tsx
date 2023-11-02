@@ -27,8 +27,13 @@ export default function Catalog() {
         "Content-Type": "application/json",
       },
     })
-      .then(async (response) => (await response.json())["content"])
-      .catch((error) => console.log(error));
+      .then((response) => {
+        if (response.status == 200) {
+          return response.json();
+        }
+      })
+      .then((response) => console.log(response))
+      .catch((error: Error) => console.log(error));
   }
 
   function inputFilled() {

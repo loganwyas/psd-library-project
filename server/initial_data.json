@@ -1,0 +1,143 @@
+{
+  "catalog": {
+    "book": [
+      {
+        "title": "Harry Potter and the Sorcerer's Stone",
+        "author": "J.K. Rowling",
+        "release": 1997
+      },
+      {
+        "title": "Animal Farm",
+        "author": "George Orwell",
+        "release": 1945
+      },
+      { "title": "1984", "author": "George Orwell", "release": 1949 },
+      {
+        "title": "To Kill a Mockingbird",
+        "author": "Harper Lee",
+        "release": 1960
+      },
+      {
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "release": 1925
+      },
+      {
+        "title": "Pride and Prejudice",
+        "author": "Jane Austen",
+        "release": 1813
+      }
+    ],
+
+    "movie": [
+      {
+        "title": "2001: A Space Odyssey",
+        "author": "Stanley Kubrick",
+        "release": 1968
+      },
+      {
+        "title": "The Godfather",
+        "author": "Francis Ford Coppola",
+        "release": 1972
+      },
+      {
+        "title": "Citizen Kane",
+        "author": "Orson Welles",
+        "release": 1941
+      },
+      {
+        "title": "Raiders of the Lost Ark",
+        "author": "Steven Spielberg",
+        "release": 1981
+      },
+      {
+        "title": "The Dark Knight",
+        "author": "Christopher Nolan",
+        "release": 2008
+      },
+      {
+        "title": "Back to the Future",
+        "author": "Robert Zemeckis",
+        "release": 1985
+      }
+    ],
+
+    "videoGame": [
+      {
+        "title": "Minecraft",
+        "author": "Markus (Notch) Persson",
+        "release": 2009
+      },
+      {
+        "title": "Tetris",
+        "author": "Alexey Pajitnov",
+        "release": 1985
+      },
+      {
+        "title": "Dark Souls",
+        "author": "FromSoftware",
+        "release": 2011
+      },
+      {
+        "title": "Super Mario World",
+        "author": "Nintendo EAD",
+        "release": 1990
+      },
+      { "title": "GoldenEye 007", "author": "Rare", "release": 1997 },
+      {
+        "title": "Street Fighter II: The World Warrior",
+        "author": "Capcom",
+        "release": 1991
+      }
+    ]
+  },
+
+  "libraries": [
+    { "latitude": 33.669726, "longitude": -85.196788, "name": "Pius Library" },
+    {
+      "latitude": 35.669761,
+      "longitude": -86.8967,
+      "name": "Cliff Cave Library"
+    },
+    {
+      "latitude": 32.224346,
+      "longitude": -95.918823,
+      "name": "Main Street Library"
+    },
+    {
+      "latitude": 38.408981,
+      "longitude": -81.242047,
+      "name": "City Central Library"
+    },
+    {
+      "latitude": 31.383898,
+      "longitude": -99.182073,
+      "name": "Oakwood Library"
+    },
+    {
+      "latitude": 36.1211,
+      "longitude": -91.246618,
+      "name": "Maplewood Library"
+    },
+    {
+      "latitude": 30.614037,
+      "longitude": -92.220039,
+      "name": "Riverside Library"
+    },
+    {
+      "latitude": 30.128132,
+      "longitude": -80.748971,
+      "name": "Hillside Library"
+    },
+    {
+      "latitude": 30.208261,
+      "longitude": -85.57077,
+      "name": "West End Library"
+    },
+    {
+      "latitude": 34.990136,
+      "longitude": -81.512981,
+      "name": "Sunnydale Library"
+    }
+  ]
+}
