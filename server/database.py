@@ -16,9 +16,9 @@ class Database():
             )
         """)
 
-        # Create the Books table
+        # Create the Catalog table
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS Books (
+            CREATE TABLE IF NOT EXISTS Catalog (
                 id INTEGER PRIMARY KEY,
                 title TEXT NOT NULL,
                 author TEXT NOT NULL,
@@ -37,19 +37,10 @@ class Database():
                 INSERT INTO Users (username, password, role)
                 VALUES (?, ?, ?)
             """, ("user", "user_password", "user"))
+            
+            
         except:
             pass
-
-        # Add some books
-        self.cursor.execute("""
-            INSERT INTO Books (title, author, published_year)
-            VALUES (?, ?, ?)
-        """, ("Book 1", "Author 1", 2020))
-
-        self.cursor.execute("""
-            INSERT INTO Books (title, author, published_year)
-            VALUES (?, ?, ?)
-        """, ("Book 2", "Author 2", 2019))
 
         self.conn.commit()
 

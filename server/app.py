@@ -5,7 +5,7 @@ import json
 from flask import Flask, Response, request
 import os
 from flask_cors import CORS, cross_origin
-from database_demo import Database
+from database import Database
 
 # Creates the Flask app and configures it based on the correct environment
 app = Flask(__name__)
@@ -57,3 +57,25 @@ def create_account():
         mimetype="application/json",
         status=status_code,
     )
+    
+@app.route("/catalog", methods=["GET"])
+@cross_origin()
+def catalog():
+    db = Database()
+    data = None
+    searchValue = ""
+    for arg, value in request.args.items():
+        if arg == "search":
+            array = value.split(" ")
+            for index, val in enumerate(array):
+                if val != "":
+                    searchValue += val
+                    if index != len(array) - 1:
+                        searchValue += " "
+    
+                    
+    return Response(
+        json.dumps(data) if data else None,
+        mimetype="application/json",
+        status=200,
+    )  
