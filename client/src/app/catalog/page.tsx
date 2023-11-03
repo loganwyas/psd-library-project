@@ -30,6 +30,8 @@ export default function Catalog() {
       .then((response) => {
         if (response.status == 200) {
           return response.json();
+        } else {
+          throw Error("Failed to get catalog");
         }
       })
       .then((response) => console.log(response))

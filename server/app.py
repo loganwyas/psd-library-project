@@ -73,9 +73,9 @@ def catalog():
                     if index != len(array) - 1:
                         searchValue += " "
     
-                    
+    data = db.get_catalog(searchValue)
     return Response(
-        json.dumps(data) if data else None,
+        json.dumps(data) if data != None else None,
         mimetype="application/json",
-        status=200,
+        status=(200 if data != None else 404),
     )  

@@ -38,21 +38,44 @@ class Database():
             )
         """)
         
-        try:
-            # Add an admin user
-            self.cursor.execute("""
-                INSERT INTO Users (username, password, role)
-                VALUES (?, ?, ?)
-            """, ("admin", "admin_password", "admin"))
-
-            # Add a regular user
-            self.cursor.execute("""
-                INSERT INTO Users (username, password, role)
-                VALUES (?, ?, ?)
-            """, ("user", "user_password", "user"))
-            
+        # Create the ItemCounts table
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS ItemCounts (
+                library_id INTEGER,
+                item_id INTEGER,
+                count INTEGER,
+                PRIMARY KEY(library_id, item_id),
+                FOREIGN KEY(library_id) REFERENCES Libraries(id),
+                FOREIGN KEY(item_id) REFERENCES Catalog(id)
+            )
+        """)
+        
+        # Create the UserItemStatus table
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS UserItemStatus (
+                user_id INTEGER,
+                library_id INTEGER,
+                item_id INTEGER,
+                status TEXT NOT NULL,
+                date INTEGER,
+                PRIMARY KEY(user_id, library_id, item_id),
+                FOREIGN KEY(user_id) REFERENCES Users(id),
+                FOREIGN KEY(library_id) REFERENCES Libraries(id),
+                FOREIGN KEY(item_id) REFERENCES Catalog(id)
+            )
+        """)
+        
+        try:           
+            # Add initial data to the database
             with open("initial_data.json", "r") as file:
                 data = json.load(file)
+                
+                for user in data["users"]:
+                    self.cursor.execute("""
+                        INSERT INTO Users (username, password, role)
+                        VALUES (?, ?, ?)
+                    """, (user["username"], user["password"], user["role"]))
+                    
                 catalog = data["catalog"]
                 for itemType in ["book", "videoGame", "movie"]:
                     items = catalog[itemType]
@@ -67,6 +90,12 @@ class Database():
                         INSERT INTO Libraries (name, latitude, longitude)
                         VALUES (?, ?, ?)
                     """, (library["name"], library["latitude"], library["longitude"]))
+                    
+                for count in data["counts"]:
+                    self.cursor.execute("""
+                        INSERT INTO ItemCounts (library_id, item_id, count)
+                        VALUES (?, ?, ?)
+                    """, (count["library"], count["item"], count["count"]))
                         
         except:
             pass
@@ -92,3 +121,9 @@ class Database():
         if (user and user[1] == password):
             return user
         return None
+    
+    def get_catalog(self, search):
+        param = "%" + search + "%"
+        self.cursor.execute("SELECT * FROM Catalog WHERE UPPER(title) LIKE UPPER(?) OR UPPER(author) LIKE UPPER(?)", (param,param))
+        items = self.cursor.fetchall()
+        return items
