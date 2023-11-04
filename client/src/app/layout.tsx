@@ -9,6 +9,7 @@ import { Inter } from "next/font/google";
 
 import Cookies from "universal-cookie";
 import { useEffect, useState } from "react";
+import { User } from "@/models/User";
 
 const cookies = new Cookies();
 
@@ -21,7 +22,7 @@ export default function RootLayout({
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null as unknown as User);
 
   useEffect(() => {
     setUser(cookies.get("user"));
@@ -37,7 +38,10 @@ export default function RootLayout({
         <nav className="top-0 bg-gray-400 p-6 flex flex-wrap space-x-7">
           <Link href="/">Home</Link>
           {user && <Link href="/catalog">Catalog</Link>}
-          {user && <Link href="/admin">Admin</Link>}
+          {user && user.role === "admin" && <Link href="/admin">Admin</Link>}
+          {user && user.role === "librarian" && (
+            <Link href="/library">Library</Link>
+          )}
           {!user && (
             <Link href="/login" className="!ml-auto">
               Login

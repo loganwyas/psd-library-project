@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
 import Cookies from "universal-cookie";
+import { CatalogItem } from "@/models/CatalogItem";
 const cookies = new Cookies();
 
 export default function Catalog() {
   const [user, setUser] = useState(null);
   const [search, setSearch] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState([] as CatalogItem[]);
+  const [searchMade, setSearchMade] = useState(false);
 
   const server = "http://127.0.0.1:5001/";
   useEffect(() => {
@@ -29,6 +31,7 @@ export default function Catalog() {
       },
     })
       .then((response) => {
+        setSearchMade(true);
         if (response.status == 200) {
           return response.json();
         } else {
@@ -85,7 +88,9 @@ export default function Catalog() {
             </div>
           );
         })}
-      {results.length == 0 && <p>There are no results for your search.</p>}
+      {searchMade && results.length == 0 && (
+        <p>There are no results for your search.</p>
+      )}
     </div>
   );
 }
