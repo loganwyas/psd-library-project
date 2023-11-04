@@ -74,8 +74,18 @@ def catalog():
                         searchValue += " "
     
     data = db.get_catalog(searchValue)
+    results = []
+    for result in data:
+        val = {
+            "id": result[0],
+            "type": result[1],
+            "title": result[2],
+            "author": result[3],
+            "release": result[4],
+        }
+        results.append(val)
     return Response(
-        json.dumps(data) if data != None else None,
+        json.dumps(results) if results != None else None,
         mimetype="application/json",
-        status=(200 if data != None else 404),
+        status=(200 if results != None else 404),
     )  

@@ -8,6 +8,7 @@ const cookies = new Cookies();
 export default function Catalog() {
   const [user, setUser] = useState(null);
   const [search, setSearch] = useState("");
+  const [results, setResults] = useState([]);
 
   const server = "http://127.0.0.1:5001/";
   useEffect(() => {
@@ -34,12 +35,23 @@ export default function Catalog() {
           throw Error("Failed to get catalog");
         }
       })
-      .then((response) => console.log(response))
+      .then((catalog) => setResults(catalog))
       .catch((error: Error) => console.log(error));
   }
 
   function inputFilled() {
     return search.trim() === "";
+  }
+
+  function formatCategory(type: string) {
+    if (type === "book") {
+      return "Book";
+    } else if (type === "movie") {
+      return "Movie";
+    } else if (type === "videoGame") {
+      return "Video Game";
+    }
+    return "Unknown";
   }
 
   return (
@@ -54,13 +66,26 @@ export default function Catalog() {
       <button
         onClick={() => sendSearch()}
         className={
-          "mr-3 p-2 border border-solid border-black " +
+          "mx-3 mb-5 px-2 py-1 border border-solid border-black " +
           (inputFilled() ? "text-gray-400 border-gray-400" : "")
         }
         disabled={inputFilled()}
       >
         Search
       </button>
+      {results.length > 0 &&
+        results.map((result) => {
+          return (
+            <div className="w-1/2 py-5 mx-auto bg-teal-200 mb-5">
+              <p>
+                <strong>{result["title"]}</strong> - {result["author"]}
+              </p>
+              <p>Released: {result["release"]}</p>
+              <p>Category: {formatCategory(result["type"])}</p>
+            </div>
+          );
+        })}
+      {results.length == 0 && <p>There are no results for your search.</p>}
     </div>
   );
 }
