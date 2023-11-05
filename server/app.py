@@ -74,18 +74,26 @@ def catalog():
                         searchValue += " "
     
     data = db.get_catalog(searchValue)
-    results = []
-    for result in data:
-        val = {
-            "id": result[0],
-            "type": result[1],
-            "title": result[2],
-            "author": result[3],
-            "release": result[4],
-        }
-        results.append(val)
+    print(data)
     return Response(
-        json.dumps(results) if results != None else None,
+        json.dumps(data) if data != None else None,
         mimetype="application/json",
-        status=(200 if results != None else 404),
+        status=(200 if data != None else 404),
+    )
+    
+@app.route("/library", methods=["GET"])
+@cross_origin()
+def library():
+    db = Database()
+    data = None
+    user = None
+    for arg, value in request.args.items():
+        if arg == "user":
+            user = value
+    if user:
+        data = db.get_library_from_user(user)
+    return Response(
+        json.dumps(data) if data != None else None,
+        mimetype="application/json",
+        status=(200 if data != None else 404),
     )  

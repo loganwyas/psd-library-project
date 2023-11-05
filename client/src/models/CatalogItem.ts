@@ -4,4 +4,5 @@ export interface CatalogItem {
   author: string;
   release: number;
   type: string;
+  count?: number;
 }

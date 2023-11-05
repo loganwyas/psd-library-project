@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
 import Cookies from "universal-cookie";
 import { CatalogItem } from "@/models/CatalogItem";
+import { ItemFromCatalog } from "@/components/CatalogItem";
 const cookies = new Cookies();
 
 export default function Catalog() {
@@ -46,20 +47,9 @@ export default function Catalog() {
     return search.trim() === "";
   }
 
-  function formatCategory(type: string) {
-    if (type === "book") {
-      return "Book";
-    } else if (type === "movie") {
-      return "Movie";
-    } else if (type === "videoGame") {
-      return "Video Game";
-    }
-    return "Unknown";
-  }
-
   return (
     <div className="text-center">
-      <h1>Library Catalog</h1>
+      <h1 className="text-2xl font-bold mb-5">Library Catalog</h1>
       <label htmlFor="search">Search: </label>
       <input
         onChange={(e) => setSearch(e.target.value)}
@@ -78,15 +68,7 @@ export default function Catalog() {
       </button>
       {results.length > 0 &&
         results.map((result) => {
-          return (
-            <div className="w-1/2 py-5 mx-auto bg-teal-200 mb-5">
-              <p>
-                <strong>{result["title"]}</strong> - {result["author"]}
-              </p>
-              <p>Released: {result["release"]}</p>
-              <p>Category: {formatCategory(result["type"])}</p>
-            </div>
-          );
+          return <ItemFromCatalog item={result} />;
         })}
       {searchMade && results.length == 0 && (
         <p>There are no results for your search.</p>
