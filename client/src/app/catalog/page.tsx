@@ -68,7 +68,7 @@ export default function Catalog() {
       </button>
       {results.length > 0 &&
         results.map((result) => {
-          return <ItemFromCatalog item={result} />;
+          return <ItemFromCatalog item={result} editable={false} />;
         })}
       {searchMade && results.length == 0 && (
         <p>There are no results for your search.</p>

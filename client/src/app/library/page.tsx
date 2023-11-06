@@ -66,15 +66,15 @@ export default function Catalog() {
 
   return (
     <div className="text-center">
-      <h1 className="text-2xl font-bold mb-5">Your Library</h1>
+      <h1 className="text-2xl font-bold mb-5 underline">Your Library</h1>
       {library && (
         <div>
-          <h2 className="text-lg font-medium mb-5">{library.name}</h2>
-          <h3>
+          <h2 className="text-xl font-semibold mb-5">{library.name}</h2>
+          <h3 className="text-lg font-medium mb-5">
             Located at: {library.latitude} {library.longitude}
           </h3>
           {library.catalog.map((item) => {
-            return <ItemFromCatalog item={item} />;
+            return <ItemFromCatalog item={item} editable />;
           })}
         </div>
       )}
