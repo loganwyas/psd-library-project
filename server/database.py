@@ -203,3 +203,11 @@ class Database():
         item = self.cursor.fetchone()
         if item:
             return item
+        
+    def remove_library_item(self, library, item):
+        self.cursor.execute("DELETE FROM ItemCounts WHERE library_id=? AND item_id=?", (library, item))
+        self.conn.commit()
+        
+        self.cursor.execute("SELECT * FROM ItemCounts WHERE library_id=? AND item_id=?", (library, item))
+        item = self.cursor.fetchone()
+        return not item

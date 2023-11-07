@@ -16,22 +16,30 @@ interface ItemProps {
   item: CatalogItem;
   editable?: boolean;
   saveFunction?: Function;
+  deleteFunction?: Function;
 }
 
 export function ItemFromCatalog(props: ItemProps) {
   const [editing, setEditing] = useState(false);
-  let item = props.item;
-  const [editingItem, setEditItem] = useState(item);
+  const [item, setItem] = useState({ ...props.item });
+  const [editingItem, setEditItem] = useState({ ...props.item });
 
   function discard() {
-    setEditItem(item);
+    setEditItem({ ...item });
     setEditing(false);
   }
 
   function save() {
-    item = editingItem;
-    if (props.saveFunction) props.saveFunction(item);
+    setItem({ ...editingItem });
+    if (props.saveFunction) props.saveFunction({ ...editingItem });
     setEditing(false);
+  }
+
+  function deleteItem() {
+    if (confirm("You are about to delete this item. Please confirm.")) {
+      if (props.deleteFunction) props.deleteFunction(item);
+      setEditing(false);
+    }
   }
 
   return (
@@ -60,6 +68,7 @@ export function ItemFromCatalog(props: ItemProps) {
               type="number"
               min="1"
               max="99"
+              placeholder={item["count"].toString()}
               onChange={(e) => {
                 let temp = editingItem;
                 let count = +e.target.value;
@@ -70,7 +79,7 @@ export function ItemFromCatalog(props: ItemProps) {
                 }
                 e.target.value = count.toString();
                 temp["count"] = count;
-                setEditItem(temp);
+                setEditItem({ ...temp });
               }}
               id="count"
               className="px-1 w-12"
@@ -91,6 +100,12 @@ export function ItemFromCatalog(props: ItemProps) {
             className="mx-3 px-2 py-1 border border-solid border-black"
           >
             Save
+          </button>
+          <button
+            onClick={() => deleteItem()}
+            className="mx-3 px-2 py-1 border border-solid border-red-600 text-red-600"
+          >
+            Delete
           </button>
         </div>
       )}

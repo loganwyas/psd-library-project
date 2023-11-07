@@ -76,7 +76,24 @@ export default function Catalog() {
     })
       .then((response) => {
         if (response.status == 200) {
-          return response.json();
+          alert("Successfully updated item");
+        }
+      })
+      .catch((error: Error) => console.log(error));
+  }
+
+  function deleteItem(item: CatalogItem) {
+    fetch(server + "remove_library_item?library=" + library.id, {
+      method: "POST",
+      body: JSON.stringify(item),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: user.username,
+      },
+    })
+      .then((response) => {
+        if (response.status == 200) {
+          window.location.reload();
         }
       })
       .catch((error: Error) => console.log(error));
@@ -93,7 +110,12 @@ export default function Catalog() {
           </h3>
           {library.catalog.map((item) => {
             return (
-              <ItemFromCatalog item={item} editable saveFunction={saveItem} />
+              <ItemFromCatalog
+                item={item}
+                editable
+                saveFunction={saveItem}
+                deleteFunction={deleteItem}
+              />
             );
           })}
         </div>

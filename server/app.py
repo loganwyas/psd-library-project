@@ -116,3 +116,22 @@ def edit_library_item():
         mimetype="application/json",
         status=(200 if data != None else 404),
     )
+    
+@app.route("/remove_library_item", methods=["POST"])
+@cross_origin()
+def remove_library_item():
+    catalog_item = request.get_json()
+    db = Database()
+    success = False
+    library = None
+    for arg, value in request.args.items():
+        if arg == "library":
+            library = value
+    if library:
+        success = db.remove_library_item(library, catalog_item["id"])
+        
+    return Response(
+        json.dumps(catalog_item) if success else None,
+        mimetype="application/json",
+        status=(200 if success else 404),
+    )
