@@ -194,3 +194,12 @@ class Database():
         if librarian:
             library = self.get_library_from_id(librarian[1])
             return library
+        
+    def set_library_item_count(self, library, item, count):
+        self.cursor.execute("UPDATE ItemCounts SET count=? WHERE library_id=? AND item_id=?", (count, library, item))
+        self.conn.commit()
+        
+        self.cursor.execute("SELECT * FROM ItemCounts WHERE library_id=? AND item_id=?", (library, item))
+        item = self.cursor.fetchone()
+        if item:
+            return item

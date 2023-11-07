@@ -6,6 +6,7 @@ import Cookies from "universal-cookie";
 import { User } from "@/models/User";
 import { Library } from "@/models/Library";
 import { ItemFromCatalog } from "@/components/CatalogItem";
+import { CatalogItem } from "@/models/CatalogItem";
 
 const cookies = new Cookies();
 
@@ -64,6 +65,23 @@ export default function Catalog() {
     }
   }, [loaded, user]);
 
+  function saveItem(item: CatalogItem) {
+    fetch(server + "edit_library_item?library=" + library.id, {
+      method: "POST",
+      body: JSON.stringify(item),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: user.username,
+      },
+    })
+      .then((response) => {
+        if (response.status == 200) {
+          return response.json();
+        }
+      })
+      .catch((error: Error) => console.log(error));
+  }
+
   return (
     <div className="text-center">
       <h1 className="text-2xl font-bold mb-5 underline">Your Library</h1>
@@ -74,7 +92,9 @@ export default function Catalog() {
             Located at: {library.latitude} {library.longitude}
           </h3>
           {library.catalog.map((item) => {
-            return <ItemFromCatalog item={item} editable />;
+            return (
+              <ItemFromCatalog item={item} editable saveFunction={saveItem} />
+            );
           })}
         </div>
       )}

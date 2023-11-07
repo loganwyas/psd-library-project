@@ -96,4 +96,23 @@ def library():
         json.dumps(data) if data != None else None,
         mimetype="application/json",
         status=(200 if data != None else 404),
-    )  
+    )
+    
+@app.route("/edit_library_item", methods=["POST"])
+@cross_origin()
+def edit_library_item():
+    catalog_item = request.get_json()
+    db = Database()
+    data = None
+    library = None
+    for arg, value in request.args.items():
+        if arg == "library":
+            library = value
+    if library:
+        data = db.set_library_item_count(library, catalog_item["id"], catalog_item["count"])
+        
+    return Response(
+        json.dumps(data) if data != None else None,
+        mimetype="application/json",
+        status=(200 if data != None else 404),
+    )

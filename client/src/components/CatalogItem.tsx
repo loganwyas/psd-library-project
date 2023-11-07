@@ -14,7 +14,8 @@ function formatCategory(type: string) {
 
 interface ItemProps {
   item: CatalogItem;
-  editable: boolean;
+  editable?: boolean;
+  saveFunction?: Function;
 }
 
 export function ItemFromCatalog(props: ItemProps) {
@@ -29,6 +30,7 @@ export function ItemFromCatalog(props: ItemProps) {
 
   function save() {
     item = editingItem;
+    if (props.saveFunction) props.saveFunction(item);
     setEditing(false);
   }
 
@@ -57,13 +59,21 @@ export function ItemFromCatalog(props: ItemProps) {
             <input
               type="number"
               min="1"
+              max="99"
               onChange={(e) => {
                 let temp = editingItem;
-                temp["count"] = +e.target.value;
+                let count = +e.target.value;
+                if (count < 1) {
+                  count = 1;
+                } else if (count > 99) {
+                  count = 99;
+                }
+                e.target.value = count.toString();
+                temp["count"] = count;
                 setEditItem(temp);
               }}
               id="count"
-              className="px-1"
+              className="px-1 w-12"
             />
           )}
         </p>
