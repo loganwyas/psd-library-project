@@ -15,6 +15,7 @@ function formatCategory(type: string) {
 interface ItemProps {
   item: CatalogItem;
   editable?: boolean;
+  isUnadded?: boolean;
   saveFunction?: Function;
   deleteFunction?: Function;
 }
@@ -44,13 +45,14 @@ export function ItemFromCatalog(props: ItemProps) {
 
   return (
     <div className="w-1/2 py-5 mx-auto bg-teal-200 mb-5">
-      {props.editable && !editing && (
+      {(props.editable || props.isUnadded) && !editing && (
         <div className="text-right">
           <button
             onClick={() => setEditing(true)}
             className="mx-3 px-2 py-1 border border-solid border-black"
           >
-            Edit
+            {props.editable && "Edit"}
+            {props.isUnadded && "+"}
           </button>
         </div>
       )}
@@ -87,6 +89,7 @@ export function ItemFromCatalog(props: ItemProps) {
           )}
         </p>
       )}
+
       {props.editable && editing && (
         <div className="flex flex-wrap justify-evenly mt-5">
           <button
@@ -106,6 +109,46 @@ export function ItemFromCatalog(props: ItemProps) {
             className="mx-3 px-2 py-1 border border-solid border-red-600 text-red-600"
           >
             Delete
+          </button>
+        </div>
+      )}
+
+      {props.isUnadded && editing && (
+        <div className="flex flex-wrap justify-evenly mt-5">
+          <button
+            onClick={() => discard()}
+            className="mx-3 px-2 py-1 border border-solid border-black"
+          >
+            Cancel
+          </button>
+          <div>
+            <span className="mr-3">Number of this item in stock:</span>
+            <input
+              type="number"
+              min="1"
+              max="99"
+              placeholder="1"
+              onChange={(e) => {
+                let temp = editingItem;
+                let count = +e.target.value;
+                if (count < 1) {
+                  count = 1;
+                } else if (count > 99) {
+                  count = 99;
+                }
+                e.target.value = count.toString();
+                temp["count"] = count;
+                setEditItem({ ...temp });
+              }}
+              id="count"
+              className="px-1 w-12"
+            />
+          </div>
+          <button
+            onClick={() => save()}
+            className="mx-3 px-2 py-1 border border-solid border-black"
+          >
+            Add
           </button>
         </div>
       )}
