@@ -159,6 +159,13 @@
     }
   ],
 
+  "librarians": [
+    {
+      "user": 3,
+      "library": 3
+    }
+  ],
+
   "counts": [
     { "library": 1, "item": 1, "count": 4 },
     { "library": 1, "item": 2, "count": 2 },

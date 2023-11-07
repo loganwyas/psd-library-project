@@ -74,18 +74,101 @@ def catalog():
                         searchValue += " "
     
     data = db.get_catalog(searchValue)
-    results = []
-    for result in data:
-        val = {
-            "id": result[0],
-            "type": result[1],
-            "title": result[2],
-            "author": result[3],
-            "release": result[4],
-        }
-        results.append(val)
+    print(data)
     return Response(
-        json.dumps(results) if results != None else None,
+        json.dumps(data) if data != None else None,
         mimetype="application/json",
-        status=(200 if results != None else 404),
-    )  
+        status=(200 if data != None else 404),
+    )
+    
+@app.route("/library", methods=["GET"])
+@cross_origin()
+def library():
+    db = Database()
+    data = None
+    user = None
+    for arg, value in request.args.items():
+        if arg == "user":
+            user = value
+    if user:
+        data = db.get_library_from_user(user)
+    return Response(
+        json.dumps(data) if data != None else None,
+        mimetype="application/json",
+        status=(200 if data != None else 404),
+    )
+    
+@app.route("/add_library_item", methods=["POST"])
+@cross_origin()
+def add_library_item():
+    catalog_item = request.get_json()
+    db = Database()
+    data = None
+    library = None
+    for arg, value in request.args.items():
+        if arg == "library":
+            library = value
+    if library:
+        data = db.add_library_item_count(library, catalog_item["id"], catalog_item["count"])
+        
+    return Response(
+        json.dumps(data) if data != None else None,
+        mimetype="application/json",
+        status=(200 if data != None else 404),
+    )
+    
+@app.route("/edit_library_item", methods=["POST"])
+@cross_origin()
+def edit_library_item():
+    catalog_item = request.get_json()
+    db = Database()
+    data = None
+    library = None
+    for arg, value in request.args.items():
+        if arg == "library":
+            library = value
+    if library:
+        data = db.set_library_item_count(library, catalog_item["id"], catalog_item["count"])
+        
+    return Response(
+        json.dumps(data) if data != None else None,
+        mimetype="application/json",
+        status=(200 if data != None else 404),
+    )
+    
+@app.route("/remove_library_item", methods=["POST"])
+@cross_origin()
+def remove_library_item():
+    catalog_item = request.get_json()
+    db = Database()
+    success = False
+    library = None
+    for arg, value in request.args.items():
+        if arg == "library":
+            library = value
+    if library:
+        success = db.remove_library_item(library, catalog_item["id"])
+        
+    return Response(
+        json.dumps(catalog_item) if success else None,
+        mimetype="application/json",
+        status=(200 if success else 404),
+    )
+    
+@app.route("/unadded_library_items", methods=["GET"])
+@cross_origin()
+def unadded_library_items():
+    db = Database()
+    data = None
+    library = None
+    for arg, value in request.args.items():
+        if arg == "library":
+            library = value
+    if library:
+        data = db.get_unadded_library_items(library)
+        
+    return Response(
+        json.dumps(data) if data != None else None,
+        mimetype="application/json",
+        status=(200 if data != None else 404),
+    )

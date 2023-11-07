@@ -38,6 +38,17 @@ class Database():
             )
         """)
         
+        # Create the Librarians table
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS Librarians (
+                user_id INTEGER,
+                library_id INTEGER,
+                PRIMARY KEY(user_id, library_id),
+                FOREIGN KEY(user_id) REFERENCES Users(id),
+                FOREIGN KEY(library_id) REFERENCES Libraries(id)
+            )
+        """)
+        
         # Create the ItemCounts table
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS ItemCounts (
@@ -91,6 +102,12 @@ class Database():
                         VALUES (?, ?, ?)
                     """, (library["name"], library["latitude"], library["longitude"]))
                     
+                for librarian in data["librarians"]:
+                    self.cursor.execute("""
+                        INSERT INTO Librarians (user_id, library_id)
+                        VALUES (?, ?)
+                    """, (librarian["user"], librarian["library"]))
+                    
                 for count in data["counts"]:
                     self.cursor.execute("""
                         INSERT INTO ItemCounts (library_id, item_id, count)
@@ -125,5 +142,95 @@ class Database():
     def get_catalog(self, search):
         param = "%" + search + "%"
         self.cursor.execute("SELECT * FROM Catalog WHERE UPPER(title) LIKE UPPER(?) OR UPPER(author) LIKE UPPER(?)", (param,param))
-        items = self.cursor.fetchall()
+        results = self.cursor.fetchall()
+        items = []
+        for result in results:
+            item = self.get_item_from_id(result[0])
+            items.append(item)
         return items
+    
+    def get_item_from_id(self, item_id):
+        self.cursor.execute("SELECT * FROM Catalog WHERE id=?", (item_id,))
+        item = self.cursor.fetchone()
+        if item:
+            val = {
+                "id": item[0],
+                "type": item[1],
+                "title": item[2],
+                "author": item[3],
+                "release": item[4],
+            }
+            return val
+    
+    def get_items_from_library(self, library_id):
+        self.cursor.execute("SELECT * FROM ItemCounts WHERE library_id=?", (library_id,))
+        items = self.cursor.fetchall()
+        if items:
+            formattedItems = []
+            for val in items:
+                catalogItem = self.get_item_from_id(val[1])
+                if catalogItem:
+                    catalogItem["count"] = val[2]
+                    formattedItems.append(catalogItem)
+            return formattedItems
+        
+    def get_unadded_library_items(self, library_id):
+        self.cursor.execute("SELECT * FROM Catalog WHERE NOT EXISTS (SELECT * FROM ItemCounts WHERE ItemCounts.library_id=? AND ItemCounts.item_id=Catalog.id)", (library_id,))
+        items = self.cursor.fetchall()
+        if items:
+            formattedItems = []
+            for val in items:
+                catalogItem = self.get_item_from_id(val[0])
+                if catalogItem:
+                    formattedItems.append(catalogItem)
+            return formattedItems
+    
+    def get_library_from_id(self, library_id):
+        self.cursor.execute("SELECT * FROM Libraries WHERE id=?", (library_id,))
+        val = self.cursor.fetchone()
+        if val:
+            catalog = self.get_items_from_library(val[0])
+            library = {
+                "id": val[0],
+                "name": val[1],
+                "latitude": val[2],
+                "longitude": val[3],
+                "catalog": catalog
+            }
+            return library
+    
+    def get_library_from_user(self, user_id):
+        self.cursor.execute("SELECT * FROM Librarians WHERE user_id=?", (user_id,))
+        librarian = self.cursor.fetchone()
+        if librarian:
+            library = self.get_library_from_id(librarian[1])
+            return library
+        
+    def add_library_item_count(self, library, item, count):
+        self.cursor.execute("""
+            INSERT INTO ItemCounts (library_id, item_id, count)
+            VALUES (?, ?, ?)
+        """, (library, item, count))
+        self.conn.commit()
+        
+        self.cursor.execute("SELECT * FROM ItemCounts WHERE library_id=? AND item_id=?", (library, item))
+        item = self.cursor.fetchone()
+        if item:
+            return item
+        
+    def set_library_item_count(self, library, item, count):
+        self.cursor.execute("UPDATE ItemCounts SET count=? WHERE library_id=? AND item_id=?", (count, library, item))
+        self.conn.commit()
+        
+        self.cursor.execute("SELECT * FROM ItemCounts WHERE library_id=? AND item_id=?", (library, item))
+        item = self.cursor.fetchone()
+        if item:
+            return item
+        
+    def remove_library_item(self, library, item):
+        self.cursor.execute("DELETE FROM ItemCounts WHERE library_id=? AND item_id=?", (library, item))
+        self.conn.commit()
+        
+        self.cursor.execute("SELECT * FROM ItemCounts WHERE library_id=? AND item_id=?", (library, item))
+        item = self.cursor.fetchone()
+        return not item
