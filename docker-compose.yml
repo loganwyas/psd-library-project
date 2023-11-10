@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  server:
+    build: server/
+    ports:
+      - 5001:5001
+
+    restart: always
+
+  client:
+    depends_on:
+      - server
+
+    image: nextjs-docker
+
+    build: client/
+    ports:
+      - 3001:3001
+
+    restart: always

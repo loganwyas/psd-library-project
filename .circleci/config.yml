@@ -1,34 +1,51 @@
 version: 2.1
 
-orbs:
-  python: circleci/python@2.1.1
-  node: circleci/node@5.1.0
-
 jobs:
-  build_server:
-    executor: python/default
-    working_directory: ~/server
-    steps:
-      - checkout
-      - python/install-packages:
-          pip-dependency-file: server/requirements.txt
-          pkg-manager: pip
-
   build_client:
-    executor: node/default
-    working_directory: ~/library
+    docker:
+      - image: cimg/python:3.8
     steps:
       - checkout
-      - node/install-packages:
-          app-dir: ~/library/client/
-          pkg-manager: npm
+      - setup_remote_docker:
+          version: 19.03.13
       - run:
-          command: "cd client; npm run build"
-      - store_artifacts:
-          path: client/build
+          name: Docker build
+          command: docker-compose build -t $DOCKERHUB_USERNAME/myapp:${CIRCLE_SHA1} .
+      - run:
+          name: Authenticate with Docker Hub
+          command: echo "$DOCKERHUB_PASS" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - run:
+          name: Push Docker Image to Docker Hub
+          command: docker-compose push $DOCKERHUB_USERNAME/myapp:${CIRCLE_SHA1}
+
+  build_server:
+    docker:
+      - image: cimg/python:3.8
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+      - run:
+          name: Docker build
+          command: docker build -t $DOCKERHUB_USERNAME/myapp:${CIRCLE_SHA1} .
+      - run:
+          name: Authenticate with Docker Hub
+          command: echo "$DOCKERHUB_PASS" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - run:
+          name: Push Docker Image to Docker Hub
+          command: docker push $DOCKERHUB_USERNAME/myapp:${CIRCLE_SHA1}
 
 workflows:
-  project-workflow:
+  version: 2
+  build_and_deploy:
     jobs:
-      - build_server
-      - build_client
+      - build_client:
+          filters:
+            branches:
+              - main
+              - docker-pipeline
+      - build_server:
+          filters:
+            branches:
+              - main
+              - docker-pipeline
