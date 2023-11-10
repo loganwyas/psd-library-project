@@ -17,6 +17,14 @@ jobs:
           command: python server/tests.py
 
       - run:
+          name: List Python version
+          command: python --version
+
+      - run:
+          name: List Python packages
+          command: pip freeze
+
+      - run:
           name: List files
           command: cd server; ls -lR | more
 
