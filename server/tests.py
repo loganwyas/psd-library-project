@@ -8,3 +8,7 @@ def test_login():
         assert user[2] == "user"
     else:
         assert False
+        
+if __name__ == '__main__':
+    db = Database()
+    print(db.get_catalog(""))
