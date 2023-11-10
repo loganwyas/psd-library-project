@@ -6,13 +6,15 @@ services:
     ports:
       - 5001:5001
 
+    image: loganwyas/library-project:server
+
     restart: always
 
   client:
     depends_on:
       - server
 
-    image: nextjs-docker
+    image: loganwyas/library-project:client
 
     build: client/
     ports:
