@@ -16,7 +16,7 @@ jobs:
           command: echo "$DOCKERHUB_PASS" | docker login --username $DOCKERHUB_USERNAME --password-stdin
       - run:
           name: Push Docker Image to Docker Hub
-          command: docker-compose push $DOCKERHUB_USERNAME/library-project
+          command: docker-compose push $DOCKERHUB_USERNAME/library-project:${CIRCLE_SHA1}
 
 workflows:
   version: 2
