@@ -11,11 +11,11 @@ jobs:
           wget https://sqlite.org/2022/sqlite-autoconf-3380500.tar.gz
           tar -xvf sqlite-autoconf-3380500.tar.gz
       - run: |
+          cd /sqlite-autoconf-3380500
           ./configure
           make
           sudo make install
           export PATH="/usr/local/lib:$PATH"
-        working-directory: sqlite-autoconf-3380500
 
       - python/install-packages:
           pip-dependency-file: server/requirements.txt
