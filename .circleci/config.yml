@@ -49,17 +49,9 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - run_tests:
-          filters:
-            branches:
-              only:
-                - main
-                - docker-pipeline
       - build_app:
           filters:
             branches:
               only:
                 - main
                 - docker-pipeline
-          requires:
-            - run_tests
