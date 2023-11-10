@@ -9,10 +9,7 @@ def getRandomString():
 def test_login():
     db = Database()
     user = db.login("admin", "password")
-    if user:
-        assert user[2] == "admin"
-    else:
-        assert False
+    assert (user and user[2] == "admin")
         
 def test_failed_login():
     db = Database()
@@ -23,10 +20,7 @@ def test_add_user():
     db = Database()
     username = getRandomString()
     user = db.add_user(username, "secure_password", "user")
-    if user:
-        assert user[2] == "user" and user[0] == username
-    else:
-        assert False
+    assert (user and user[2] == "user" and user[0] == username)
         
 def test_failed_add_user():
     db = Database()
@@ -46,15 +40,32 @@ def test_get_catalog_one_item():
 def test_get_item_from_id():
     db = Database()
     item = db.get_item_from_id(1)
-    if item:
-        assert item["author"] == "J.K. Rowling" and item["release"] == 1997
-    else:
-        assert False
+    assert (item and item["author"] == "J.K. Rowling" and item["release"] == 1997)
         
 def test_failed_get_item_from_id():
     db = Database()
     item = db.get_item_from_id(174391838941)
     assert not item
+    
+def test_get_library_from_id():
+    db = Database()
+    library = db.get_library_from_id(10)
+    assert (library and library["name"] == "Sunnydale Library" and len(library["catalog"]) == 15)
+        
+def test_failed_get_library_from_id():
+    db = Database()
+    library = db.get_library_from_id(58390143415890)
+    assert not library
+    
+def test_get_library_from_user():
+    db = Database()
+    library = db.get_library_from_user(3)
+    assert (library and library["id"] == 3)
+    
+def test_failed_get_library_from_user():
+    db = Database()
+    library = db.get_library_from_user(7838941)
+    assert not library
         
 if __name__ == '__main__':
     db = Database()
