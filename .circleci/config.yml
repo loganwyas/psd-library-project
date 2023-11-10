@@ -7,12 +7,25 @@ jobs:
     executor: python/default
     steps:
       - checkout
+      - run: |
+          wget https://sqlite.org/2022/sqlite-autoconf-3380500.tar.gz
+          tar -xvf sqlite-autoconf-3380500.tar.gz
+      - run: |
+          ./configure
+          make
+          sudo make install
+          export PATH="/usr/local/lib:$PATH"
+        working-directory: sqlite-autoconf-3380500
+
       - python/install-packages:
           pip-dependency-file: server/requirements.txt
           pkg-manager: pip
+
       - run:
           name: Run tests
           command: python -m pytest server/tests.py
+          env:
+            LD_LIBRARY_PATH: /usr/local/lib
 
   build_app:
     docker:
