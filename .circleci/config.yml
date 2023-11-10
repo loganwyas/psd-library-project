@@ -4,8 +4,7 @@ orbs:
 
 jobs:
   run_tests:
-    machine:
-      image: ubuntu-2004:202201-02
+    executor: python/default
     steps:
       - checkout
 
@@ -15,7 +14,7 @@ jobs:
 
       - run:
           name: Run file
-          command: python3 server/tests.py
+          command: python server/tests.py
 
       - run:
           name: List files
@@ -23,7 +22,7 @@ jobs:
 
       - run:
           name: Run tests
-          command: python3 -m pytest server/tests.py
+          command: python -m pytest server/tests.py
 
   build_app:
     docker:
