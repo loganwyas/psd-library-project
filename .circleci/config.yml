@@ -17,12 +17,8 @@ jobs:
           command: python server/tests.py
 
       - run:
-          name: List Python version
-          command: python --version
-
-      - run:
-          name: List Python packages
-          command: pip freeze
+          name: List SQLite version
+          command: python -c "import sqlite3; print(sqlite3.version); print(sqlite3.sqlite_version)"
 
       - run:
           name: List files
