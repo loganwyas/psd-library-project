@@ -13,10 +13,16 @@ jobs:
           command: docker-compose build
       - run:
           name: Authenticate with Docker Hub
-          command: echo "${{ secrets.DOCKERHUB_PASS }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          env:
+            DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+            DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_PASS }}
+          command: echo "$DOCKERHUB_PASS" | docker login --username $DOCKERHUB_USERNAME --password-stdin
       - run:
           name: Push Docker Image to Docker Hub
-          command: docker-compose push ${{ secrets.DOCKERHUB_USERNAME }}/library-project:${CIRCLE_SHA1}
+          env:
+            DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+            DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_PASS }}
+          command: docker-compose push $DOCKERHUB_USERNAME/library-project:${CIRCLE_SHA1}
 
 workflows:
   version: 2
