@@ -9,7 +9,6 @@ export default function Profile() {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        // 尝试从 sessionStorage 中恢复用户信息
         const savedName = sessionStorage.getItem('name');
         const savedPassword = sessionStorage.getItem('password');
         const savedProfilePic = sessionStorage.getItem('profilePic');
