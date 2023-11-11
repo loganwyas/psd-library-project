@@ -234,3 +234,26 @@ class Database():
         self.cursor.execute("SELECT * FROM ItemCounts WHERE library_id=? AND item_id=?", (library, item))
         item = self.cursor.fetchone()
         return not item
+
+    def put_item_hold(self, user_id, library_id, item_id, status, date):
+        try:
+            # Check if the user is a librarian for the specified library
+            self.cursor.execute("SELECT * FROM Librarians WHERE user_id=? AND library_id=?", (user_id, library_id))
+            librarian = self.cursor.fetchone()
+            if librarian:
+                # Check if the item exists in the library
+                self.cursor.execute("SELECT * FROM ItemCounts WHERE library_id=? AND item_id=?", (library_id, item_id))
+                item_count = self.cursor.fetchone()
+                if item_count:
+                    # Insert or update the hold status in UserItemStatus table
+                    self.cursor.execute("""
+                        INSERT OR REPLACE INTO UserItemStatus (user_id, library_id, item_id, status, date)
+                        VALUES (?, ?, ?, ?, ?)
+                    """, (user_id, library_id, item_id, status, date))
+                    self.conn.commit()
+
+                    return True  # Successfully put the item on hold
+        except sqlite3.Error as e:
+            print("SQLite error:", e)
+
+        return False  # Failed to put the item on hold
