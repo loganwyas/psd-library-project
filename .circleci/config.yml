@@ -13,20 +13,8 @@ jobs:
           pkg-manager: pip
 
       - run:
-          name: Run file
-          command: python server/tests.py
-
-      - run:
-          name: List SQLite version
-          command: python -c "import sqlite3; print(sqlite3.version); print(sqlite3.sqlite_version)"
-
-      - run:
-          name: List files
-          command: cd server; ls -lR | more
-
-      - run:
           name: Run tests
-          command: python -m pytest server/tests.py
+          command: cd server; python -m pytest tests.py
 
   build_app:
     docker:
@@ -49,9 +37,19 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
+      - run_tests:
+          filters:
+            branches:
+              only:
+                - main
+                - docker-pipeline
+                - fix-pipeline
       - build_app:
           filters:
             branches:
               only:
                 - main
                 - docker-pipeline
+                - fix-pipeline
+          requires:
+            - run_tests
