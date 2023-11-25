@@ -23,9 +23,14 @@ export default function RootLayout({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [user, setUser] = useState(null as unknown as User);
+  const [profilePic, setProfilePic] = useState("");
 
   useEffect(() => {
     setUser(cookies.get("user"));
+    let profile = sessionStorage.getItem("profilePic");
+    if (profile !== null && profile !== "null") {
+      setProfilePic(profile);
+    }
   }, [pathname, searchParams]);
 
   function logout() {
@@ -42,16 +47,23 @@ export default function RootLayout({
           {user && user.role === "librarian" && (
             <Link href="/library">Library</Link>
           )}
-          {!user && (
-            <Link href="/login" className="!ml-auto">
-              Login
-            </Link>
-          )}
-          {user && (
-            <Link href="/login" onClick={logout} className="!ml-auto">
-              Logout
-            </Link>
-          )}
+          <div className="!ml-auto flex flex-wrap">
+            {!user && <Link href="/login">Login</Link>}
+            {user && (
+              <Link href="/profile" className="mr-5">
+                <img
+                  src={profilePic ? profilePic : "/profile-img-placeholder.png"}
+                  alt="Profile Picture"
+                  className="rounded-full w-8 h-8"
+                />
+              </Link>
+            )}
+            {user && (
+              <Link href="/login" onClick={logout}>
+                Logout
+              </Link>
+            )}
+          </div>
         </nav>
         <div className="mt-8">{children}</div>
       </body>
