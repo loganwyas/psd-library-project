@@ -1,5 +1,9 @@
 import sqlite3
 import json
+import time
+
+def get_time():
+    return round(time.time() * 1000)
 
 class Database():
     def __init__(self):
@@ -268,3 +272,25 @@ class Database():
             print("SQLite error:", e)
 
         return False  # Failed to put the item on hold
+
+    def checkout_item(self, user_id, library_id, item_id):
+        self.cursor.execute("""
+            INSERT OR REPLACE INTO UserItemStatus (user_id, library_id, item_id, status, date)
+            VALUES (?, ?, ?, ?, ?)
+        """, (user_id, library_id, item_id, "checked_out", get_time()))
+        self.conn.commit()
+        
+    def get_user_items(self, user_id):
+        self.cursor.execute("SELECT * FROM UserItemStatus WHERE user_id=?", (user_id,))
+        raw_items = self.cursor.fetchall()
+        items = []
+        for raw_item in raw_items:
+            item = {
+                "user_id": raw_item[0],
+                "library_id": raw_item[1],
+                "item_id": raw_item[2],
+                "status": raw_item[3],
+                "date": raw_item[4]
+            }
+            items.append(item)
+        return items
