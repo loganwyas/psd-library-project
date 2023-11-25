@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
 import Cookies from "universal-cookie";
+import { User } from "@/models/User";
 const cookies = new Cookies();
 
 export default function Login() {
@@ -14,6 +15,7 @@ export default function Login() {
   const server = "http://127.0.0.1:5001/";
   function login(creatingAccount: boolean) {
     let address = creatingAccount ? "create_account" : "login";
+    setLogging(false);
     fetch(server + address, {
       method: "POST",
       body: JSON.stringify({
@@ -36,7 +38,9 @@ export default function Login() {
           throw new Error(message);
         }
       })
-      .then((user) => {
+      .then((user: User) => {
+        sessionStorage.setItem("profilePic", user.profilePic);
+        user.profilePic = "";
         cookies.set("user", user, { path: "/" });
         setLogging(true);
       })
@@ -49,6 +53,7 @@ export default function Login() {
 
   useEffect(() => {
     let user = cookies.get("user");
+    console.log(user);
     if (user) {
       redirect("/");
     }

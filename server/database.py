@@ -13,7 +13,9 @@ class Database():
                 id INTEGER PRIMARY KEY,
                 username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
-                role TEXT NOT NULL
+                role TEXT NOT NULL,
+                name TEXT,
+                profilePic TEXT
             )
         """)
 
@@ -127,17 +129,26 @@ class Database():
             """, (username, password, role))
             self.conn.commit()
 
-            self.cursor.execute("SELECT username, password, role, id FROM Users WHERE username=?", (username,))
+            self.cursor.execute("SELECT username, password, role, id, name, profilePic FROM Users WHERE username=?", (username,))
             return self.cursor.fetchone()
         except:
             return None
     
     def login(self, username, password):
-        self.cursor.execute("SELECT username, password, role, id FROM Users WHERE username=?", (username,))
+        self.cursor.execute("SELECT username, password, role, id, name, profilePic FROM Users WHERE username=?", (username,))
         user = self.cursor.fetchone()
         if (user and user[1] == password):
             return user
         return None
+    
+    def change_user_info(self, username, password, name, profilePic):
+        try:
+            self.cursor.execute("UPDATE Users SET password=?, name=?, profilePic=? WHERE username=?", (password, name, profilePic, username))
+            self.conn.commit()
+            return {"username": username}
+        except:
+            return
+        
     
     def get_catalog(self, search):
         param = "%" + search + "%"

@@ -28,6 +28,8 @@ def login():
             "username": user[0],
             "password": user[1],
             "role": user[2],
+            "name": user[4],
+            "profilePic": user[5]
         }
         status_code = 200
     return Response(
@@ -50,7 +52,24 @@ def create_account():
             "username": user[0],
             "password": user[1],
             "role": user[2],
+            "name": user[4],
+            "profilePic": user[5]
         }
+        status_code = 200
+    return Response(
+        json.dumps(data) if data else None,
+        mimetype="application/json",
+        status=status_code,
+    )
+    
+@app.route("/profile", methods=["POST"])
+@cross_origin()
+def profile():
+    user_info = request.get_json()
+    db = Database()
+    data = db.change_user_info(user_info["username"], user_info["password"], user_info["name"], user_info["profilePic"])
+    status_code = 404
+    if data:
         status_code = 200
     return Response(
         json.dumps(data) if data else None,
