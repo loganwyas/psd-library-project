@@ -93,7 +93,6 @@ def catalog():
                         searchValue += " "
     
     data = db.get_catalog(searchValue)
-    print(data)
     return Response(
         json.dumps(data) if data != None else None,
         mimetype="application/json",
