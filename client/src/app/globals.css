@@ -5,3 +5,7 @@
 input {
   border: 1px black solid;
 }
+
+label {
+  margin-right: 5px;
+}
