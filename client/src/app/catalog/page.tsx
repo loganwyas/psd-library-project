@@ -25,6 +25,7 @@ export default function Catalog() {
   }, []);
 
   function sendSearch() {
+    setSearchMade(false);
     fetch(server + "catalog?search=" + search, {
       method: "GET",
       headers: {
@@ -66,9 +67,12 @@ export default function Catalog() {
       >
         Search
       </button>
-      {results.length > 0 &&
+      {searchMade &&
+        results.length > 0 &&
         results.map((result) => {
-          return <ItemFromCatalog item={result} editable={false} />;
+          return (
+            <ItemFromCatalog item={result} editable={false} key={result.id} />
+          );
         })}
       {searchMade && results.length == 0 && (
         <p>There are no results for your search.</p>
