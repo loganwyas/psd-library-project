@@ -43,6 +43,7 @@ export default function RootLayout({
         <nav className="top-0 bg-gray-400 p-6 flex flex-wrap space-x-7">
           <Link href="/">Home</Link>
           {user && <Link href="/catalog">Catalog</Link>}
+          {user && <Link href="/my_items">My Items</Link>}
           {user && user.role === "admin" && <Link href="/admin">Admin</Link>}
           {user && user.role === "librarian" && (
             <Link href="/library">Library</Link>

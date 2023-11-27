@@ -68,6 +68,20 @@ export function ItemFromCatalog(props: ItemProps) {
     }
   }
 
+  function isOneLibraryCheckedOut() {
+    if (props.libraries) {
+      let libraries = Object.keys(props.libraries);
+      for (let i = 0; i < libraries.length; i++) {
+        let key = libraries[i];
+        let library = props.libraries ? props.libraries[+key] : undefined;
+        if (library && getStatus(library.id) === "checked_out") {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   return (
     <div className="w-1/2 py-5 mx-auto bg-teal-200 mb-5">
       {(props.editable || props.isUnadded) && !editing && (
@@ -193,7 +207,9 @@ export function ItemFromCatalog(props: ItemProps) {
             let count = val.length > 0 ? val[0] : undefined;
             if (
               count &&
-              ((count.total > 0 && count.available > 0) ||
+              ((count.total > 0 &&
+                count.available > 0 &&
+                !isOneLibraryCheckedOut()) ||
                 getStatus(library.id) === "checked_out")
             ) {
               return (
