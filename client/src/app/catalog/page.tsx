@@ -6,15 +6,22 @@ import Cookies from "universal-cookie";
 import { CatalogItem } from "@/models/CatalogItem";
 import { ItemFromCatalog } from "@/components/CatalogItem";
 import { Library } from "@/models/Library";
+import { User } from "@/models/User";
+import { UserItem } from "@/models/UserItem";
 const cookies = new Cookies();
 
 export default function Catalog() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null as unknown as User);
+
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([] as CatalogItem[]);
   const [searchMade, setSearchMade] = useState(false);
+
   const [libraries, setLibraries] = useState({} as { [id: number]: Library });
-  const [gottenLibraries, setGotten] = useState(false);
+  const [gottenLibraries, setGottenLibraries] = useState(false);
+
+  const [userItems, setUserItems] = useState(null as unknown as UserItem[]);
+  const [gottenUserItems, setGottenUserItems] = useState(false);
 
   const server = "http://127.0.0.1:5001/";
   useEffect(() => {
@@ -39,7 +46,7 @@ export default function Catalog() {
           }
         })
         .then((libraries) => {
-          setGotten(true);
+          setGottenLibraries(true);
           setLibraries(libraries);
         })
         .catch((error: Error) => console.log(error));
@@ -49,6 +56,26 @@ export default function Catalog() {
 
   function sendSearch() {
     setSearchMade(false);
+    if (!gottenUserItems && user) {
+      fetch(server + "get_user_items?user=" + user.id, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (response.status == 200) {
+            return response.json();
+          } else {
+            throw Error("Failed to get user items");
+          }
+        })
+        .then((items) => {
+          setGottenUserItems(true);
+          setUserItems(items);
+        })
+        .catch((error: Error) => console.log(error));
+    }
     fetch(server + "catalog?search=" + search, {
       method: "GET",
       headers: {
@@ -64,7 +91,6 @@ export default function Catalog() {
         }
       })
       .then((catalog) => {
-        console.log(catalog);
         setResults(catalog);
       })
       .catch((error: Error) => console.log(error));
@@ -72,6 +98,44 @@ export default function Catalog() {
 
   function inputFilled() {
     return search.trim() === "";
+  }
+
+  function checkoutItem(library: number, item: number) {
+    fetch(
+      server + `checkout_item?library=${library}&user=${user.id}&item=${item}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ item }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      })
+      .catch((error: Error) => console.log(error));
+  }
+
+  function returnItem(library: number, item: number) {
+    fetch(
+      server + `return_item?library=${library}&user=${user.id}&item=${item}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ item }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      })
+      .catch((error: Error) => console.log(error));
   }
 
   return (
@@ -100,8 +164,10 @@ export default function Catalog() {
             <ItemFromCatalog
               item={result}
               editable={false}
+              userItems={userItems}
               libraries={libraries}
-              key={result.id}
+              saveFunction={checkoutItem}
+              deleteFunction={returnItem}
             />
           );
         })}

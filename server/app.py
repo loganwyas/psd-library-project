@@ -227,6 +227,31 @@ def checkout_item():
         status=(200 if success else 404),
     )
     
+@app.route("/return_item", methods=["POST"])
+@cross_origin()
+def return_item():
+    db = Database()
+    success = None
+    library = None
+    user = None
+    item = None
+    for arg, value in request.args.items():
+        if arg == "library":
+            library = value
+        elif arg == "user":
+            user = value
+        elif arg == "item":
+            item = value
+            
+    if library and user and item:
+        success = db.return_item(user, library, item)
+        
+    return Response(
+        json.dumps([library, user, item]) if success else None,
+        mimetype="application/json",
+        status=(200 if success else 404),
+    )
+    
 @app.route("/get_user_items", methods=["GET"])
 @cross_origin()
 def get_user_items():

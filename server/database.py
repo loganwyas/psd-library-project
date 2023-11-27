@@ -310,15 +310,24 @@ class Database():
         except:
             return False
         
+    def return_item(self, user_id, library_id, item_id):
+        try:
+            self.cursor.execute("""
+                DELETE FROM UserItemStatus WHERE user_id=? AND library_id=? AND item_id=?
+            """, (user_id, library_id, item_id))
+            self.conn.commit()
+            return True
+        except:
+            return False
+        
     def get_user_items(self, user_id):
         self.cursor.execute("SELECT * FROM UserItemStatus WHERE user_id=?", (user_id,))
         raw_items = self.cursor.fetchall()
         items = []
         for raw_item in raw_items:
             item = {
-                "user_id": raw_item[0],
-                "library_id": raw_item[1],
-                "item_id": raw_item[2],
+                "library": raw_item[1],
+                "item": raw_item[2],
                 "status": raw_item[3],
                 "date": raw_item[4]
             }
