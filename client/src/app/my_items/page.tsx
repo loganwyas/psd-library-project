@@ -13,7 +13,6 @@ const cookies = new Cookies();
 export default function Catalog() {
   const [user, setUser] = useState(null as unknown as User);
 
-  const [search, setSearch] = useState("");
   const [results, setResults] = useState([] as CatalogItem[]);
   const [searchMade, setSearchMade] = useState(false);
 
@@ -24,6 +23,7 @@ export default function Catalog() {
   const [gottenUserItems, setGottenUserItems] = useState(false);
 
   const server = "http://127.0.0.1:5001/";
+
   useEffect(() => {
     let userCookie = cookies.get("user");
     if (!userCookie) {
@@ -51,12 +51,11 @@ export default function Catalog() {
         })
         .catch((error: Error) => console.log(error));
     }
-    setSearch(search.replace(" ", "%20"));
   }, []);
 
-  function sendSearch() {
-    setSearchMade(false);
+  useEffect(() => {
     if (!gottenUserItems && user) {
+      setSearchMade(false);
       fetch(server + "get_user_items?user=" + user.id, {
         method: "GET",
         headers: {
@@ -73,32 +72,38 @@ export default function Catalog() {
         .then((items) => {
           setGottenUserItems(true);
           setUserItems(items);
+          fetch(server + "catalog", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              if (response.status == 200) {
+                return response.json();
+              } else {
+                throw Error("Failed to get catalog");
+              }
+            })
+            .then((catalog) => {
+              let newCatalog = [] as CatalogItem[];
+              for (let i = 0; i < items.length; i++) {
+                let item = items[i] as UserItem;
+                for (let x = 0; x < catalog.length; x++) {
+                  let catalogItem = catalog[x] as CatalogItem;
+                  if (item.item === catalogItem.id) {
+                    newCatalog.push(catalogItem);
+                  }
+                }
+              }
+              setResults(newCatalog);
+              setSearchMade(true);
+            })
+            .catch((error: Error) => console.log(error));
         })
         .catch((error: Error) => console.log(error));
     }
-    fetch(server + "catalog?search=" + search, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        setSearchMade(true);
-        if (response.status == 200) {
-          return response.json();
-        } else {
-          throw Error("Failed to get catalog");
-        }
-      })
-      .then((catalog) => {
-        setResults(catalog);
-      })
-      .catch((error: Error) => console.log(error));
-  }
-
-  function inputFilled() {
-    return search.trim() === "";
-  }
+  }, [user]);
 
   function checkoutItem(library: number, item: number) {
     fetch(
@@ -140,23 +145,7 @@ export default function Catalog() {
 
   return (
     <div className="text-center">
-      <h1 className="text-2xl font-bold mb-5">Library Catalog</h1>
-      <label htmlFor="search">Search: </label>
-      <input
-        onChange={(e) => setSearch(e.target.value)}
-        id="search"
-        className="px-1"
-      />
-      <button
-        onClick={() => sendSearch()}
-        className={
-          "mx-3 mb-5 px-2 py-1 border border-solid border-black " +
-          (inputFilled() ? "text-gray-400 border-gray-400" : "")
-        }
-        disabled={inputFilled()}
-      >
-        Search
-      </button>
+      <h1 className="text-2xl font-bold mb-5">My Items</h1>
       {searchMade &&
         results.length > 0 &&
         results.map((result) => {
@@ -171,9 +160,7 @@ export default function Catalog() {
             />
           );
         })}
-      {searchMade && results.length == 0 && (
-        <p>There are no results for your search.</p>
-      )}
+      {searchMade && results.length == 0 && <p>You do not have any items.</p>}
     </div>
   );
 }

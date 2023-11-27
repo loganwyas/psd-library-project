@@ -1,4 +1,6 @@
-import { CatalogItem } from "@/models/CatalogItem";
+import { CatalogItem, LibraryCount } from "@/models/CatalogItem";
+import { Library } from "@/models/Library";
+import { UserItem } from "@/models/UserItem";
 import { useState } from "react";
 
 function formatCategory(type: string) {
@@ -14,6 +16,8 @@ function formatCategory(type: string) {
 
 interface ItemProps {
   item: CatalogItem;
+  libraries?: { [id: number]: Library };
+  userItems?: UserItem[];
   editable?: boolean;
   isUnadded?: boolean;
   saveFunction?: Function;
@@ -41,6 +45,41 @@ export function ItemFromCatalog(props: ItemProps) {
       if (props.deleteFunction) props.deleteFunction(item);
       setEditing(false);
     }
+  }
+
+  function checkout(library: number) {
+    if (getStatus(library) === "checked_out") {
+      if (props.deleteFunction) props.deleteFunction(library, item.id);
+    } else {
+      if (props.saveFunction) props.saveFunction(library, item.id);
+    }
+  }
+
+  function getStatus(library: number) {
+    if (props.userItems) {
+      for (let i = 0; i < props.userItems.length; i++) {
+        if (
+          props.userItems[i].library === library &&
+          props.userItems[i].item === item.id
+        ) {
+          return props.userItems[i].status;
+        }
+      }
+    }
+  }
+
+  function isOneLibraryCheckedOut() {
+    if (props.libraries) {
+      let libraries = Object.keys(props.libraries);
+      for (let i = 0; i < libraries.length; i++) {
+        let key = libraries[i];
+        let library = props.libraries ? props.libraries[+key] : undefined;
+        if (library && getStatus(library.id) === "checked_out") {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   return (
@@ -152,6 +191,47 @@ export function ItemFromCatalog(props: ItemProps) {
           </button>
         </div>
       )}
+
+      {!props.editable &&
+        props.libraries &&
+        Object.keys(props.libraries).map((key) => {
+          let library = props.libraries ? props.libraries[+key] : undefined;
+          if (
+            library &&
+            item.libraryCounts &&
+            item.libraryCounts.some((lib) => lib.library === library?.id)
+          ) {
+            let val = item.libraryCounts.filter(
+              (lib) => lib.library === library?.id
+            ) as LibraryCount[];
+            let count = val.length > 0 ? val[0] : undefined;
+            if (
+              count &&
+              ((count.total > 0 &&
+                count.available > 0 &&
+                !isOneLibraryCheckedOut()) ||
+                getStatus(library.id) === "checked_out")
+            ) {
+              return (
+                <div className="flex flex-wrap justify-around bg-green-200 my-5 p-4">
+                  <p>
+                    {library.name} - {count.available}/{count.total} Available
+                  </p>
+                  <button
+                    className="mx-3 px-2 py-1 border border-solid border-black"
+                    onClick={() => checkout(library?.id as number)}
+                  >
+                    {getStatus(library?.id) === "checked_out"
+                      ? "Return to"
+                      : "Checkout from"}{" "}
+                    this library
+                  </button>
+                </div>
+              );
+            }
+          }
+          return <div></div>;
+        })}
     </div>
   );
 }
