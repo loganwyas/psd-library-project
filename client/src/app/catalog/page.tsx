@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Cookies from "universal-cookie";
 import { CatalogItem } from "@/models/CatalogItem";
 import { ItemFromCatalog } from "@/components/CatalogItem";
+import { Library } from "@/models/Library";
 const cookies = new Cookies();
 
 export default function Catalog() {
@@ -12,6 +13,8 @@ export default function Catalog() {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([] as CatalogItem[]);
   const [searchMade, setSearchMade] = useState(false);
+  const [libraries, setLibraries] = useState({} as { [id: number]: Library });
+  const [gottenLibraries, setGotten] = useState(false);
 
   const server = "http://127.0.0.1:5001/";
   useEffect(() => {
@@ -20,6 +23,26 @@ export default function Catalog() {
       redirect("/");
     } else {
       setUser(userCookie);
+    }
+    if (!gottenLibraries) {
+      fetch(server + "libraries", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (response.status == 200) {
+            return response.json();
+          } else {
+            throw Error("Failed to get libraries");
+          }
+        })
+        .then((libraries) => {
+          setGotten(true);
+          setLibraries(libraries);
+        })
+        .catch((error: Error) => console.log(error));
     }
     setSearch(search.replace(" ", "%20"));
   }, []);
@@ -40,7 +63,10 @@ export default function Catalog() {
           throw Error("Failed to get catalog");
         }
       })
-      .then((catalog) => setResults(catalog))
+      .then((catalog) => {
+        console.log(catalog);
+        setResults(catalog);
+      })
       .catch((error: Error) => console.log(error));
   }
 
@@ -71,7 +97,12 @@ export default function Catalog() {
         results.length > 0 &&
         results.map((result) => {
           return (
-            <ItemFromCatalog item={result} editable={false} key={result.id} />
+            <ItemFromCatalog
+              item={result}
+              editable={false}
+              libraries={libraries}
+              key={result.id}
+            />
           );
         })}
       {searchMade && results.length == 0 && (

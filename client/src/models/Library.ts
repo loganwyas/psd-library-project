@@ -1,7 +1,7 @@
 import { CatalogItem } from "./CatalogItem";
 
 export interface Library {
-  id: string;
+  id: number;
   name: string;
   latitude: number;
   longitude: number;

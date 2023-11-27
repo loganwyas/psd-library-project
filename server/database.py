@@ -175,6 +175,23 @@ class Database():
                 "author": item[3],
                 "release": item[4],
             }
+            self.cursor.execute("SELECT * FROM ItemCounts WHERE item_id=?", (item[0],))
+            counts = self.cursor.fetchall()
+            itemCounts = []
+            for count in counts:
+                library = count[0]
+                total = count[2]
+                self.cursor.execute("SELECT * FROM UserItemStatus WHERE item_id=? AND library_id=?", (item[0], library))
+                statuses = self.cursor.fetchall()
+                available = total - len(statuses)
+                if available < 0: available = 0
+                libraryCount = {
+                    "library": library,
+                    "total": total,
+                    "available": available
+                }
+                itemCounts.append(libraryCount)
+            val["libraryCounts"] = itemCounts
             return val
     
     def get_items_from_library(self, library_id):
@@ -200,11 +217,11 @@ class Database():
                     formattedItems.append(catalogItem)
             return formattedItems
     
-    def get_library_from_id(self, library_id):
+    def get_library_from_id(self, library_id, get_catalog=True):
         self.cursor.execute("SELECT * FROM Libraries WHERE id=?", (library_id,))
         val = self.cursor.fetchone()
         if val:
-            catalog = self.get_items_from_library(val[0])
+            catalog = self.get_items_from_library(val[0]) if get_catalog else []
             library = {
                 "id": val[0],
                 "name": val[1],
@@ -213,6 +230,15 @@ class Database():
                 "catalog": catalog
             }
             return library
+        
+    def get_libraries(self):
+        self.cursor.execute("SELECT * FROM Libraries")
+        vals = self.cursor.fetchall()
+        libraries = {}
+        for val in vals:
+            library = self.get_library_from_id(val[0], False)
+            libraries[val[0]] = library
+        return libraries
     
     def get_library_from_user(self, user_id):
         self.cursor.execute("SELECT * FROM Librarians WHERE user_id=?", (user_id,))
@@ -274,11 +300,15 @@ class Database():
         return False  # Failed to put the item on hold
 
     def checkout_item(self, user_id, library_id, item_id):
-        self.cursor.execute("""
-            INSERT OR REPLACE INTO UserItemStatus (user_id, library_id, item_id, status, date)
-            VALUES (?, ?, ?, ?, ?)
-        """, (user_id, library_id, item_id, "checked_out", get_time()))
-        self.conn.commit()
+        try:
+            self.cursor.execute("""
+                INSERT OR REPLACE INTO UserItemStatus (user_id, library_id, item_id, status, date)
+                VALUES (?, ?, ?, ?, ?)
+            """, (user_id, library_id, item_id, "checked_out", get_time()))
+            self.conn.commit()
+            return True
+        except:
+            return False
         
     def get_user_items(self, user_id):
         self.cursor.execute("SELECT * FROM UserItemStatus WHERE user_id=?", (user_id,))

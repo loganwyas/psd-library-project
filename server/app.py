@@ -116,6 +116,17 @@ def library():
         status=(200 if data != None else 404),
     )
     
+@app.route("/libraries", methods=["GET"])
+@cross_origin()
+def libraries():
+    db = Database()
+    data = db.get_libraries()
+    return Response(
+        json.dumps(data) if data else None,
+        mimetype="application/json",
+        status=(200 if data else 404),
+    )
+    
 @app.route("/add_library_item", methods=["POST"])
 @cross_origin()
 def add_library_item():
@@ -184,6 +195,49 @@ def unadded_library_items():
             library = value
     if library:
         data = db.get_unadded_library_items(library)
+        
+    return Response(
+        json.dumps(data) if data != None else None,
+        mimetype="application/json",
+        status=(200 if data != None else 404),
+    )
+    
+@app.route("/checkout_item", methods=["POST"])
+@cross_origin()
+def checkout_item():
+    db = Database()
+    success = None
+    library = None
+    user = None
+    item = None
+    for arg, value in request.args.items():
+        if arg == "library":
+            library = value
+        elif arg == "user":
+            user = value
+        elif arg == "item":
+            item = value
+            
+    if library and user and item:
+        success = db.checkout_item(user, library, item)
+        
+    return Response(
+        json.dumps([library, user, item]) if success else None,
+        mimetype="application/json",
+        status=(200 if success else 404),
+    )
+    
+@app.route("/get_user_items", methods=["GET"])
+@cross_origin()
+def get_user_items():
+    db = Database()
+    data = None
+    user = None
+    for arg, value in request.args.items():
+        if arg == "user":
+            user = value
+    if user:
+        data = db.get_user_items(user)
         
     return Response(
         json.dumps(data) if data != None else None,

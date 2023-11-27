@@ -1,4 +1,5 @@
-import { CatalogItem } from "@/models/CatalogItem";
+import { CatalogItem, LibraryCount } from "@/models/CatalogItem";
+import { Library } from "@/models/Library";
 import { useState } from "react";
 
 function formatCategory(type: string) {
@@ -14,6 +15,7 @@ function formatCategory(type: string) {
 
 interface ItemProps {
   item: CatalogItem;
+  libraries?: { [id: number]: Library };
   editable?: boolean;
   isUnadded?: boolean;
   saveFunction?: Function;
@@ -152,6 +154,30 @@ export function ItemFromCatalog(props: ItemProps) {
           </button>
         </div>
       )}
+
+      {props.libraries &&
+        Object.keys(props.libraries).map((key) => {
+          console.log(key);
+          let library = props.libraries ? props.libraries[+key] : undefined;
+          if (
+            library &&
+            item.libraryCounts &&
+            item.libraryCounts.some((lib) => lib.library === library?.id)
+          ) {
+            let val = item.libraryCounts.filter(
+              (lib) => lib.library === library?.id
+            ) as LibraryCount[];
+            let count = val.length > 0 ? val[0] : undefined;
+            if (count && count.total > 0 && count.available > 0) {
+              return (
+                <div>
+                  {library.name} - {count.available}/{count.total} Available
+                </div>
+              );
+            }
+          }
+          return <div></div>;
+        })}
     </div>
   );
 }
