@@ -35,6 +35,7 @@ export default function RootLayout({
 
   function logout() {
     cookies.set("user", null);
+    sessionStorage.setItem("profilePic", "");
   }
 
   return (
