@@ -1,3 +1,5 @@
+// Page for the user profile
+
 "use client";
 
 import Image from "next/image";

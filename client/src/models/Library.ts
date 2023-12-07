@@ -1,3 +1,5 @@
+// Type for libraries
+
 import { CatalogItem } from "./CatalogItem";
 
 export interface Library {

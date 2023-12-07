@@ -1,3 +1,5 @@
+// Layout for the application, which mainly includes the navigation
+
 "use client";
 
 import "./globals.css";
@@ -45,7 +47,6 @@ export default function RootLayout({
           <Link href="/">Home</Link>
           {user && <Link href="/catalog">Catalog</Link>}
           {user && <Link href="/my_items">My Items</Link>}
-          {user && user.role === "admin" && <Link href="/admin">Admin</Link>}
           {user && user.role === "librarian" && (
             <Link href="/library">Library</Link>
           )}

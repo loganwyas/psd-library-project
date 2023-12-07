@@ -14,8 +14,8 @@ There are two ways in which the application can be run: command line and Docker.
 
 ### Command Line
 
-We have created a single file that can be used to start the application. Run `bash run_dev_app.sh` in the root directory of the repository, and both the client and server will be running on their respective ports. If you want the client and server in separate terminal windows, open `run_dev_app.sh` and run each of the commands written in that file.
+We have created a single file that can be used to start the application. Run `bash run_dev_app.sh` in a Git Bash terminal in the root directory of the repository, and both the client and server will be running on their respective ports. If you want the client and server in separate terminal windows, open `run_dev_app.sh` and run each of the commands written in that file.
 
 ### Docker
 
-We have Dockerfiles for the application, so it can be run using Docker. To do so, first make sure that Docker is installed and running on your machine. Then, run `docker compose build` to create an image of the application. Finally, run `docker compose up`, and the application should be up and running.
+We have Dockerfiles for the application, so it can be run using Docker. To do so, first make sure that Docker is installed and running on your machine. Then, run `docker compose build` to create an image of the application. Finally, run `docker compose up`, and the application should be up and running on their respective ports.

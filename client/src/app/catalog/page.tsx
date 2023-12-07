@@ -1,3 +1,5 @@
+// Page to search for and display catalog items
+
 "use client";
 
 import { useEffect, useState } from "react";
