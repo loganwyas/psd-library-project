@@ -1,3 +1,5 @@
+// Component for catalog items
+
 import { CatalogItem, LibraryCount } from "@/models/CatalogItem";
 import { Library } from "@/models/Library";
 import { UserItem } from "@/models/UserItem";

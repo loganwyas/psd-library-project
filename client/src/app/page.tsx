@@ -1,4 +1,4 @@
-import Image from "next/image";
+// Initial page of the application
 
 export default function Home() {
   return (

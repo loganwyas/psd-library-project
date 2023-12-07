@@ -1,3 +1,5 @@
+// Page for librarians to manage their library
+
 "use client";
 
 import { useEffect, useState } from "react";

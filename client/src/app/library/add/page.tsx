@@ -1,3 +1,5 @@
+// Page to add catalog items to a library
+
 "use client";
 
 import { useEffect, useState } from "react";

@@ -1,3 +1,5 @@
+// Page to login to the application
+
 "use client";
 
 import { useEffect, useState } from "react";

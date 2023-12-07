@@ -1,19 +1,16 @@
-"""
-This file creates a Flask app
-"""
+# Creates a Flask API and connects to the database
+
 import json
 from flask import Flask, Response, request
 import os
 from flask_cors import CORS, cross_origin
 from database import Database
 
-# Creates the Flask app and configures it based on the correct environment
 app = Flask(__name__)
-
-# Configures the CORS policy to work with our React app
 CLIENT_URLS = ["http://localhost:3001", "http://127.0.0.1:3001"]
 cors = CORS(app, resources={r"*": {"origins": CLIENT_URLS}})
 
+# Attempt to login using account information
 @app.route("/login", methods=["POST"])
 @cross_origin()
 def login():
@@ -37,7 +34,8 @@ def login():
         mimetype="application/json",
         status=status_code,
     )
-    
+
+# Create an account
 @app.route("/create_account", methods=["POST"])
 @cross_origin()
 def create_account():
@@ -62,6 +60,7 @@ def create_account():
         status=status_code,
     )
     
+# Edit profile information
 @app.route("/profile", methods=["POST"])
 @cross_origin()
 def profile():
@@ -76,7 +75,8 @@ def profile():
         mimetype="application/json",
         status=status_code,
     )
-    
+
+# Get catalog items based on search query
 @app.route("/catalog", methods=["GET"])
 @cross_origin()
 def catalog():
@@ -98,7 +98,8 @@ def catalog():
         mimetype="application/json",
         status=(200 if data != None else 404),
     )
-    
+   
+# Get library information based on the librarian 
 @app.route("/library", methods=["GET"])
 @cross_origin()
 def library():
@@ -115,7 +116,8 @@ def library():
         mimetype="application/json",
         status=(200 if data != None else 404),
     )
-    
+
+# Get a list of all libraries
 @app.route("/libraries", methods=["GET"])
 @cross_origin()
 def libraries():
@@ -127,6 +129,7 @@ def libraries():
         status=(200 if data else 404),
     )
     
+# Add an item to the library
 @app.route("/add_library_item", methods=["POST"])
 @cross_origin()
 def add_library_item():
@@ -145,7 +148,8 @@ def add_library_item():
         mimetype="application/json",
         status=(200 if data != None else 404),
     )
-    
+
+# Edit a catalog item within a library
 @app.route("/edit_library_item", methods=["POST"])
 @cross_origin()
 def edit_library_item():
@@ -164,7 +168,8 @@ def edit_library_item():
         mimetype="application/json",
         status=(200 if data != None else 404),
     )
-    
+
+# Remove an item from a library
 @app.route("/remove_library_item", methods=["POST"])
 @cross_origin()
 def remove_library_item():
@@ -184,6 +189,7 @@ def remove_library_item():
         status=(200 if success else 404),
     )
     
+# Get all items not in a specific library
 @app.route("/unadded_library_items", methods=["GET"])
 @cross_origin()
 def unadded_library_items():
@@ -202,6 +208,7 @@ def unadded_library_items():
         status=(200 if data != None else 404),
     )
     
+# Checkout an item from the library
 @app.route("/checkout_item", methods=["POST"])
 @cross_origin()
 def checkout_item():
@@ -227,6 +234,7 @@ def checkout_item():
         status=(200 if success else 404),
     )
     
+# Return an item to the library
 @app.route("/return_item", methods=["POST"])
 @cross_origin()
 def return_item():
@@ -252,6 +260,7 @@ def return_item():
         status=(200 if success else 404),
     )
     
+# Get all user items
 @app.route("/get_user_items", methods=["GET"])
 @cross_origin()
 def get_user_items():

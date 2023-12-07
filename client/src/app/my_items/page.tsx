@@ -1,3 +1,5 @@
+// Page to display user items
+
 "use client";
 
 import { useEffect, useState } from "react";

@@ -1,3 +1,5 @@
+// Type for catalog items
+
 export interface CatalogItem {
   id: number;
   title: string;
